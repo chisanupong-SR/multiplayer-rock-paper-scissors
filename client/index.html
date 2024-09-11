@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiplayer Rock Paper Scissors</title>
+  <!-- โหลดไลบรารี Socket.IO -->
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div>
+    <h1>Multiplayer Rock Paper Scissors</h1>
+    <button onclick="makeMove('rock')" style="font-size: 7em;" >👊</button>
+    <button onclick="makeMove('paper')" style="font-size: 7em;" >🤚</button>
+    <button onclick="makeMove('scissors')" style="font-size: 7em;">✌️</button>
+    <p id="status">Connecting to game...</p>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
