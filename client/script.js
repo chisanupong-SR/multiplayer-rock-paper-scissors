@@ -17,8 +17,12 @@ socket.on('joinedGame', (data) => {
   document.getElementById('status').innerText = `${data.player}. Opponent is ${data.opponent}. Make your move!`;
 });
 
-socket.on('gameResult', (result) => {
-  document.getElementById('status').innerText = `Result: ${result}`;
+socket.on('showChoices', (data) => {
+  document.getElementById('status').innerText = `You chose: ${data.yourChoice}. Opponent chose: ${data.opponentChoice}. Result: ${data.result}`;
+});
+
+socket.on('draw', (data) => {
+  document.getElementById('status').innerText = `It's a draw! You chose: ${data.yourChoice}. Opponent chose: ${data.opponentChoice}. Play again!`;
 });
 
 socket.on('opponentLeft', () => {
