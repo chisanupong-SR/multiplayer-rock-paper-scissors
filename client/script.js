@@ -18,11 +18,26 @@ socket.on('joinedGame', (data) => {
 });
 
 socket.on('showChoices', (data) => {
-  document.getElementById('status').innerText = `You chose: ${data.yourChoice}. Opponent chose: ${data.opponentChoice}. Result: ${data.result}`;
+  document.getElementById('status').innerText = `
+    Current Score - You: ${player === 'Player 1' ? data.score.player1 : data.score.player2},
+    You chose: ${data.yourChoice}.
+    Opponent chose: ${data.opponentChoice}.
+    Result: ${data.result}.
+    Opponent: ${player === 'Player 1' ? data.score.player2 : data.score.player1}`;
 });
 
 socket.on('draw', (data) => {
-  document.getElementById('status').innerText = `It's a draw! You chose: ${data.yourChoice}. Opponent chose: ${data.opponentChoice}. Play again!`;
+  document.getElementById('status').innerText = `
+  Current Score - You: ${player === 'Player 1' ? data.score.player1 : data.score.player2}, 
+  It's a draw! You chose: ${data.yourChoice}. 
+  Opponent chose: ${data.opponentChoice}. 
+  Choose again!`;
+});
+
+
+
+socket.on('gameOver', (message) => {
+  document.getElementById('status').innerText = message;
 });
 
 socket.on('opponentLeft', () => {
