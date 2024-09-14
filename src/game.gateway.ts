@@ -74,29 +74,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleMakeMove(client: Socket, payload: { room: string; choice: string }) {
     const { room, choice } = payload;
     if (!this.rooms[room]) return;
-
-    const playerKey =
-      this.rooms[room].player1 === client.id ? 'player1' : 'player2';
+  
+    const playerKey = this.rooms[room].player1 === client.id ? 'player1' : 'player2';
     this.rooms[room].choices[playerKey] = choice;
-
+    // ตรวจสอบว่าผู้เล่นทั้งสองได้ทำการเลือกแล้ว
     if (Object.keys(this.rooms[room].choices).length === 2) {
+      // คำนวณผลเมื่อผู้เล่นทั้งสองได้ทำการเลือก
       const result = this.determineWinner(this.rooms[room].choices);
-
       if (result.player1 === 'Draw!') {
-        // ส่งให้ทั้งสองฝั่งรู้ว่าเกมเสมอ
+        // กรณีเสมอ
         this.server.to(this.rooms[room].player1).emit('draw', {
           yourChoice: this.rooms[room].choices['player1'],
           opponentChoice: this.rooms[room].choices['player2'],
           score: this.rooms[room].scores,
         });
-
+  
         this.server.to(this.rooms[room].player2).emit('draw', {
           yourChoice: this.rooms[room].choices['player2'],
           opponentChoice: this.rooms[room].choices['player1'],
           score: this.rooms[room].scores,
         });
-
-        // รีเซ็ตการเลือกเมื่อเสมอ
+  
+        // รีเซ็ตการเลือกเพื่อให้ผู้เล่นเลือกใหม่
         this.rooms[room].choices = {};
       } else {
         // อัปเดตคะแนน
@@ -105,38 +104,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         } else {
           this.rooms[room].scores.player2++;
         }
-
-        // ส่งผลลัพธ์ให้ผู้เล่นทั้งสองคน
+  
+        // ส่งผลลัพธ์ให้ทั้งสองฝ่าย
         this.server.to(this.rooms[room].player1).emit('showChoices', {
           yourChoice: this.rooms[room].choices['player1'],
           opponentChoice: this.rooms[room].choices['player2'],
           result: result.player1,
-          score: this.rooms[room].scores, // ส่งคะแนนไปที่ไคลเอนต์
+          score: this.rooms[room].scores,
         });
-
+  
         this.server.to(this.rooms[room].player2).emit('showChoices', {
           yourChoice: this.rooms[room].choices['player2'],
           opponentChoice: this.rooms[room].choices['player1'],
           result: result.player2,
-          score: this.rooms[room].scores, // ส่งคะแนนไปที่ไคลเอนต์
+          score: this.rooms[room].scores,
         });
-
-        // ตรวจสอบว่าผู้เล่นใดชนะครบ 2 รอบหรือยัง
+  
+        // ตรวจสอบว่าผู้เล่นชนะครบ 2 ใน 3 หรือยัง
         if (this.rooms[room].scores.player1 === 2) {
-          this.server
-            .to(this.rooms[room].player1)
-            .emit('gameOver', 'You win the game!');
-          this.server
-            .to(this.rooms[room].player2)
-            .emit('gameOver', 'You lose the game!');
+          this.server.to(this.rooms[room].player1).emit('gameOver', 'You win the game!');
+          this.server.to(this.rooms[room].player2).emit('gameOver', 'You lose the game!');
           delete this.rooms[room]; // ลบห้องเมื่อเกมจบ
         } else if (this.rooms[room].scores.player2 === 2) {
-          this.server
-            .to(this.rooms[room].player1)
-            .emit('gameOver', 'You lose the game!');
-          this.server
-            .to(this.rooms[room].player2)
-            .emit('gameOver', 'You win the game!');
+          this.server.to(this.rooms[room].player1).emit('gameOver', 'You lose the game!');
+          this.server.to(this.rooms[room].player2).emit('gameOver', 'You win the game!');
           delete this.rooms[room];
         } else {
           // เริ่มรอบใหม่
@@ -149,8 +140,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     player1: string;
     player2: string;
   } {
-    const [choice1, choice2] = Object.values(choices);
-
+    const choice1 = choices.player1;
+    const choice2 = choices.player2;
+    
     if (choice1 === choice2) {
       return { player1: 'Draw!', player2: 'Draw!' };
     }
